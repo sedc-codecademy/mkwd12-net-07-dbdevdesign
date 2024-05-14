@@ -82,6 +82,7 @@ SELECT FirstName, LastName FROM dbo.Customer -- select specific columns
 SELECT Age AS [Customer Age] FROM dbo.Customer
 GO
 
+
 -- ***** UPDATE *****
 -- update values in tables
 --UPDATE dbo.Customer SET City = 'Tokyo' -- rarely used
