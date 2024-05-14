@@ -1,5 +1,13 @@
 USE [master]
 GO
+-- query for the execution of the whole file to work as aspected
+IF EXISTS (SELECT name FROM sys.databases WHERE name = N'SEDC')
+	ALTER DATABASE [SEDC] SET  SINGLE_USER WITH ROLLBACK IMMEDIATE
+GO
+USE [Master]
+GO
+DROP DATABASE IF EXISTS [SEDC]
+GO
 CREATE DATABASE [SEDC]
 GO
 USE [SEDC]
