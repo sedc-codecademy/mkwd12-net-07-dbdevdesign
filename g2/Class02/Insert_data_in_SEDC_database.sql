@@ -78,7 +78,7 @@ from @Market m
 CROSS APPLY @City c
 
 update c set AccountNumber = id + cast(233255 * rand(id*7) as int),
-Customerize = case when id%3 = 0 then 'Small' when id % 3 = 1 then 'Medium' else 'Large' end, 
+CustomerSize = case when id%3 = 0 then 'Small' when id % 3 = 1 then 'Medium' else 'Large' end, 
 PhoneNumber = N'070' + Cast(cast(1000000 * rand(id*3) as int) as nvarchar(10))
  from dbo.Customer c
 
