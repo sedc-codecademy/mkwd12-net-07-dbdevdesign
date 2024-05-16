@@ -292,3 +292,104 @@ FROM Employees
 WHERE HireDate >= '1990.01.01' and HireDate < '1990.05.05'
 and LastName like 'S%'
 GO
+
+-- SECOND WORKSHOP
+--Find all Employees with FirstName = Aleksandar ordered by Last Name
+--List all Employees ordered by LastName
+--Find all Male employees ordered by HireDate, starting from the last hired
+
+SELECT * 
+FROM Employees
+WHERE FirstName = 'Aleksandar'
+ORDER BY LastName 
+GO
+
+SELECT *
+FROM Employees
+ORDER BY LastName
+GO
+
+SELECT *
+FROM Employees
+WHERE Gender = 'M'
+ORDER BY HireDate DESC
+GO
+
+-- THIRD WORKSHOP
+-- List all BusinessEntity Names and Customer Names in single result set with duplicates
+-- List all regions where we have BusinessEntities and Customers in the same time
+-- List all regions where some BusinessEntity is based, or some Customer is based. Remove duplicates
+
+SELECT * FROM BusinessEntities
+SELECT * FROM Customers
+
+SELECT Name -- => First we select given prop (NAME)
+FROM BusinessEntities -- => FROM GIVEN TABLE (BusinessEntities)
+UNION ALL -- => WE WANT TO DO UNION, maybe UNION ALL or INTERSECT
+SELECT Name -- => Afterwards we select with which prop to do the union
+FROM Customers -- => And we select from which table that prop should come
+GO
+
+SELECT Region
+FROM BusinessEntities
+--UNION ALL
+--UNION
+INTERSECT -- => The correct answer
+SELECT RegionName
+FROM Customers
+GO
+
+SELECT Region
+FROM BusinessEntities
+UNION
+SELECT RegionName
+FROM Customers
+GO
+
+-- WORKSHOP 4
+--Change Products table always to insert value 1 in price column if no price is provided on insert
+--Change Products table to prevent inserting Price that will more than 2x bigger then the cost price
+--Change Products table to guarantee unique names across the products
+
+SELECT * 
+FROM Products
+
+ALTER TABLE Products
+ADD CONSTRAINT Price
+DEFAULT 1 FOR Price
+GO
+
+ALTER TABLE [dbo].[Products] WITH CHECK
+ADD CONSTRAINT CHK_Products_Price
+CHECK (price<=Cost*2)
+GO
+
+-- THIS WONT WORK BECAUSE WE ALREADY HAVE DUPLICATES
+ALTER TABLE [dbo].[Products] WITH CHECK
+ADD CONSTRAINT UCK_Product_Name UNIQUE (Name)
+GO
+
+-- Removing duplicate
+update p set Name = 'Gluten Free New'
+from Products p
+WHERE Name = 'Gluten Free'
+and id = 13
+GO
+
+-- adding foreign key
+ALTER TABLE Orders WITH CHECK
+ADD CONSTRAINT [FK_Order_BusinessEntity] FOREIGN KEY(BusinessEntityID)
+REFERENCES [dbo].[BusinessEntities] ([ID])
+GO
+
+ALTER TABLE
+
+
+
+
+
+
+
+
+
+
