@@ -234,12 +234,12 @@ GO
 GO
 
 
-SELECT * from dbo.BusinessEntities
-select * from dbo.Employees
-SELECT * from dbo.Products
-select * from dbo.Customers 
-select * from dbo.[Orders]
-select * from dbo.[OrderDetails]
+SELECT * FROM dbo.BusinessEntities
+SELECT * FROM dbo.Employees
+SELECT * FROM dbo.Products
+SELECT * FROM dbo.Customers 
+SELECT * FROM dbo.[Orders]
+SELECT * FROM dbo.[OrderDetails]
 
 --end 
 --class code bellow =>
@@ -376,14 +376,90 @@ WHERE Name = 'Gluten Free'
 and id = 13
 GO
 
--- adding foreign key
+--CONSTRAINTS (FOREIGN KEY)
+
+-- adding foreign key constraint
 ALTER TABLE Orders WITH CHECK
 ADD CONSTRAINT [FK_Order_BusinessEntity] FOREIGN KEY(BusinessEntityID)
 REFERENCES [dbo].[BusinessEntities] ([ID])
 GO
 
-ALTER TABLE
+--INSERTING WITH NON EXISTING BusinessENtityId
+Insert into Orders (OrderDate, Status, BusinessEntityId, CustomerId,EmployeeId,TotalPrice,Comment)
+select '2019.05.01' as OrderDate, 0 as Status, 9999 as BusinessEntityId , 1 as CustomerId , 1 as EmployeeId , 1000 as TotalPrice, N'' as comment
+GO
 
+-- DROPPING ALL CONSTRAINTS
+ALTER TABLE [dbo].[Order] DROP CONSTRAINT [FK_Order_BusinessEntity];
+ALTER TABLE [dbo].[Order] DROP CONSTRAINT [FK_Order_Employee];
+ALTER TABLE [dbo].[Order] DROP CONSTRAINT [FK_Order_Customer];
+ALTER TABLE [dbo].[OrderDetails] DROP CONSTRAINT [FK_OrderDetails_Order];
+ALTER TABLE [dbo].[OrderDetails] DROP CONSTRAINT [FK_OrderDetails_Product];
+
+--ADDING ALL CONSTRAINTS
+ALTER TABLE [dbo].[OrderDetails] ADD CONSTRAINT [FK_OrderDetails_Order] FOREIGN KEY ([OrderId]) REFERENCES [dbo].[Orders]([Id]);
+ALTER TABLE [dbo].[Orders] ADD CONSTRAINT [FK_Order_BusinessEntity] FOREIGN KEY ([BusinessEntityId]) REFERENCES [dbo].[BusinessEntities]([Id]);
+ALTER TABLE [dbo].[Orders] ADD CONSTRAINT [FK_Order_Employee] FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[Employees]([Id]);
+ALTER TABLE [dbo].[Orders] ADD CONSTRAINT [FK_Order_Customer] FOREIGN KEY ([CustomerId]) REFERENCES [dbo].[Customers]([Id]);
+ALTER TABLE [dbo].[OrderDetails] ADD CONSTRAINT [FK_OrderDetails_Product] FOREIGN KEY ([ProductId]) REFERENCES [dbo].[Products]([Id]);
+
+--END OF CONSTRAINTS (FOREIGN KEY)
+
+--JOINS WORKSHOP 5
+--List all possible combinations of Customer names and Product names that can be ordered from specific customer 
+--List all Business Entities that have any Order 
+--List all Business Entities without orders
+--List all Customers without orders (using Right Join and using Left join)
+
+USE [SEDC]
+GO
+
+SELECT * FROM dbo.BusinessEntities
+SELECT * FROM dbo.Employees
+SELECT * FROM dbo.Products
+SELECT * FROM dbo.Customers 
+SELECT * FROM dbo.[Orders]
+SELECT * FROM dbo.[OrderDetails]
+
+SELECT c.Name as CustomerName, p.Name as ProductName
+FROM dbo.Customers c
+CROSS JOIN dbo.Products p
+GO
+
+-- 1st way with full names for tables
+SELECT DISTINCT dbo.BusinessEntities.Name
+FROM dbo.Orders
+INNER JOIN dbo.BusinessEntities ON dbo.BusinessEntities.Id = dbo.Orders.BusinessEntityId
+GO
+
+--2nd and better way with custom names for tables
+SELECT DISTINCT b.Name
+FROM dbo.Orders o
+INNER JOIN dbo.BusinessEntities b ON b.Id = o.BusinessEntityId
+GO
+
+--1. Getting the name 
+SELECT DISTINCT b.NAME
+--2. from businessentitites table
+FROM dbo.BusinessEntities b
+--we are left joining orders table on businessentitiyId  and sort of comparing 
+-- column ID in table business entities with column BusinessEntityID from orders Table
+LEFT JOIN dbo.Orders o on b.Id = o.BusinessEntityId
+--Adding constraint with WHERE, where businessEntity is null
+WHERE o.BusinessEntityId IS NULL
+GO
+
+SELECT c.*
+FROM dbo.Orders o
+RIGHT JOIN dbo.Customers c on o.CustomerId = c.Id
+WHERE o.CustomerId IS NULL
+GO
+
+SELECT c.*
+FROM dbo.Customers c
+LEFT JOIN dbo.Orders o ON o.CustomerId = c.Id
+WHERE o.CustomerId IS NULL
+GO
 
 
 
