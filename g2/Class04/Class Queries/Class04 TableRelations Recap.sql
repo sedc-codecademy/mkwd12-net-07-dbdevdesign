@@ -5,6 +5,7 @@ USE SEDC2
 GO
 
 -- =============== RECAP ===============
+
 CREATE TABLE [User] (
 	Id INT IDENTITY PRIMARY KEY,
 	Username NVARCHAR(50) NOT NULL,
@@ -27,7 +28,9 @@ CREATE TABLE UserDetails(
 )
 GO
 
--- ====> One to Many
+-- ====> One to Many Relationship
+-- one User can have multiple Posts (example Facebook posts)
+
 CREATE TABLE Post (
 	Id INT IDENTITY PRIMARY KEY,
 	UserId INT NOT NULL,
@@ -38,7 +41,11 @@ CREATE TABLE Post (
 GO
 
 
--- ====> Many to Many
+-- ====> Many to Many Relationship
+-- one user/student can have multiple courses
+-- one course can have multiple users/students
+-- direct 'Many to Many' relation isn't possible, so we create two 'One to Many' relations using middle table
+
 CREATE TABLE Course(
 	Id INT IDENTITY PRIMARY KEY,
 	CourseName NVARCHAR(100) NOT NULL
