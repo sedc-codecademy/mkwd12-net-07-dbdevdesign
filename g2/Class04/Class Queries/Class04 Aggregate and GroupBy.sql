@@ -2,6 +2,7 @@ USE SEDC
 GO
 
 -- ==================== AGGREGATE FUNCTIONS ====================
+-- perform calculations on a set of values and return a single value
 
 -- *** COUNT ***
 SELECT * FROM dbo.Employee e
@@ -55,7 +56,9 @@ GO
 
 
 -- ===================== GROUPING (GROUP BY) =====================
--- ====> Example
+-- GROUPING => used to organize data into groups based on one or more columns using the 'GROUP BY' clause
+
+-- ===> Example: Most expensive order by Business Entity
 SELECT be.Region, MAX(o.TotalPrice) as ExpensiveOrder
 FROM dbo.[Order] o
 INNER JOIN dbo.BusinessEntity be ON o.BusinessEntityId = be.Id
@@ -78,9 +81,32 @@ SELECT c.RegionName, COUNT(o.Id) as CountOfOrders
 FROM dbo.Customer c
 INNER JOIN dbo.[Order] o ON c.Id = o.CustomerId
 GROUP BY c.RegionName
---ORDER BY 1 asc
+--ORDER BY 1 asc -- same as ORDER BY c.RegionName
+GO
 
+-- ====> Example: Count of orders by Customer Region AND Customer Size
 SELECT c.RegionName, c.CustomerSize, COUNT(o.Id) as CountOfOrders 
 FROM dbo.Customer c
 INNER JOIN dbo.[Order] o ON c.Id = o.CustomerId
-GROUP BY c.RegionName, c.CustomerSize
+GROUP BY c.RegionName, c.CustomerSize 
+
+
+-- ===================== Filtering the grouped data with *HAVING* =====================
+
+-- ===> Example: Count of orders by Region (without Skopski region)
+SELECT c.RegionName as Region, COUNT(o.Id) as NumberOfOrders
+FROM dbo.[Order] o
+JOIN dbo.Customer c ON o.CustomerId = c.Id
+WHERE c.RegionName <> 'Skopski'  
+GROUP BY c.RegionName
+--WHERE c.RegionName <> 'Skopski' -- ERROR! We cannot use WHERE after GROUP BY clause
+
+
+-- ===> Example: Count of orders by region with orders count above 500
+SELECT c.RegionName as Region, COUNT(o.Id) as NumberOfOrders
+FROM dbo.[Order] o
+JOIN dbo.Customer c ON o.CustomerId = c.Id
+WHERE c.RegionName <> 'Skopski' --and COUNT(o.Id) > 500 -- ERROR!
+GROUP BY c.RegionName
+HAVING COUNT(o.Id) > 500
+GO

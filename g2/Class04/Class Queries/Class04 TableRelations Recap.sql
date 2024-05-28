@@ -4,7 +4,7 @@ GO
 USE SEDC2
 GO
 
--- =============== RECAP ===============
+-- =============== RECAP - Table Relations ===============
 
 CREATE TABLE [User] (
 	Id INT IDENTITY PRIMARY KEY,
