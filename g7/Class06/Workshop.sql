@@ -81,3 +81,5 @@ GO
 ALTER TABLE PizzaToppings ADD  CONSTRAINT FK_PizzaToppings_Toppings FOREIGN KEY(ToppingId)
 REFERENCES Toppings(Id)
 GO
+
+-- 4th Req /* Insert some data in the tables */
