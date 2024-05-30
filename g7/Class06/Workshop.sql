@@ -257,4 +257,110 @@ INSERT INTO PizzaToppings(Id, PizzaId, ToppingId)
 VALUES(14, 14, 2)
 
 /* Extra Requirements */
-/* There should be a function that concatenates First and Last Name of a user​ */
+/* 5th Req =>  There should be a function that concatenates First and Last Name of a user​ */
+
+CREATE FUNCTION GetFullName1
+(
+@FirstName nvarchar(255),
+@LastName nvarchar(255)
+)
+RETURNS nvarchar(511)
+AS 
+BEGIN
+RETURN @FirstName + ' ' + @LastName
+END
+GO
+
+SELECT dbo.GetFullName1('Bob', 'Bobsky')
+GO
+
+/* 6th Req => There should be a view to show all pizzas that are not 
+delivered yet and the full names of the users waiting for them​ */
+
+CREATE VIEW [undelivered Pizzas1]
+AS
+SELECT p.Name, p.SizeId, p.OrderId, dbo.GetFullName1(u.FirstName, u.LastName) AS [User] FROM Pizzas AS p
+JOIN Orders AS o ON o.Id = p.OrderId
+JOIN Users AS u ON u.Id = o.UserId
+WHERE o.IsDelivered = 0
+GO
+
+SELECT * FROM [Undelivered Pizzas1]
+GO
+
+/* 7th Req => There should be a stored procedure that when provided an OrderId, can return 
+the full price of a whole order ( Delivery + All Pizza + All Toppings )​ */
+
+CREATE PROCEDURE GetFullPriceOfOrder1 @OrderId int
+AS 
+BEGIN
+	DECLARE @pizzasPrice DECIMAL(4, 2)
+	DECLARE @toppingsPrice DECIMAL(4, 2)
+	DECLARE @orderPrice DECIMAL(4, 2)
+
+	SELECT @pizzasPrice = SUM(p.Price), @toppingsPrice = SUM(t.Price) FROM Orders AS o
+	JOIN Pizzas AS p
+	ON o.Id = p.OrderId
+	JOIN PizzaToppings AS pt
+	ON p.Id = pt.PizzaId
+	JOIN Toppings as t
+	ON t.Id = pt.ToppingId
+	WHERE o.Id = @OrderId
+
+	SELECT @orderPrice = Price FROM Orders
+	WHERE Id = @OrderId
+
+	SELECT @OrderId AS [Order Id], @orderPrice AS [Order Price], @pizzasPrice AS [Pizzas Price], @toppingsPrice AS [Toppings Price], SUM(@pizzasPrice + @toppingsPrice + @orderPrice) AS [Full Price]
+END
+GO
+
+EXEC dbo.GetFullPriceOfOrder1 @OrderId = 2
+
+/* 8th Req => There should be a view that 
+lists pizzas by the number of times ordered, 
+starting from the most popular one ( Most times ordered )​ */
+
+CREATE VIEW [Pizza Popularity] AS
+	SELECT p.Name, COUNT(p.Name) AS [Number of times ordered] FROM Orders AS o
+	JOIN Pizzas AS p
+	ON o.Id = p.OrderId
+	JOIN PizzaToppings AS pt
+	ON p.Id = pt.PizzaId
+	GROUP BY p.Name
+GO
+
+SELECT * FROM [Pizza Popularity]
+ORDER BY [Number of times ordered] DESC
+
+/* 9th Req =>  There should be a view that lists toppings 
+by the number of times ordered, starting 
+from the most popular one ( Most times ordered )​ */
+
+CREATE VIEW [Topping Popularity] AS
+	SELECT t.Name, COUNT(t.Name) AS [Number of times ordered] FROM Orders AS o
+	JOIN Pizzas AS p
+	ON o.Id = p.OrderId
+	JOIN PizzaToppings AS pt
+	ON p.Id = pt.PizzaId
+	JOIN Toppings AS t
+	ON t.Id = pt.ToppingId
+	GROUP BY t.Name
+GO
+
+SELECT * FROM [Topping Popularity]
+ORDER BY [Number of times ordered] DESC
+
+/* 10th Req => There should be a view 
+with users and the amount of pizzas they ordered​ */
+
+CREATE VIEW [Pizzas Ordered By Users] AS
+	SELECT dbo.GetFullName(u.FirstName, u.LastName) AS [User] ,COUNT(u.Id) AS [Pizzas Ordered] FROM Users AS u
+	JOIN Orders AS o
+	ON u.Id = o.UserId
+	JOIN Pizzas AS p
+	ON o.Id = p.OrderId
+	GROUP BY dbo.GetFullName(u.FirstName, u.LastName)
+GO
+
+SELECT * FROM [Pizzas Ordered By Users]
+ORDER BY [Pizzas Ordered] DESC
