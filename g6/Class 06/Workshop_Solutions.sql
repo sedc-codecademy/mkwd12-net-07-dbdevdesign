@@ -73,3 +73,69 @@ go
 /* There should be a view that lists pizzas by the number of times ordered, starting from the most popular one ( Most times ordered )​ */
 --There should be a view that lists pizzas by the number of times ordered (Call this view ordered by the most popular pizza on top)
 
+select * from Orders
+select * from Pizzas
+
+create view PizzaPopularity 
+as
+select p.[Name], count(p.[Name]) NoTimesOrdered from Pizzas p
+group by p.[Name]
+go
+
+--SELECT p.Name, 
+--	COUNT(p.Name) AS [Number of times ordered] 
+--FROM Orders AS o
+--INNER JOIN Pizzas AS p ON o.Id = p.OrderId
+--INNER JOIN PizzaToppings AS pt ON p.Id = pt.PizzaId
+--GROUP BY p.Name
+
+--select * from Orders o
+--inner join Pizzas p on o.Id = p.OrderId
+--inner join PizzaToppings pt on p.Id = pt.PizzaId
+
+select * from dbo.PizzaPopularity
+order by NoTimesOrdered desc
+go
+
+--There should be a view that lists toppings by the number of times ordered (Call this view ordered by the most popular topping on top)
+/* There should be a view that lists toppings by the number of times ordered, starting from the most popular one ( Most times ordered )​ */
+
+select * from Pizzas
+select * from PizzaToppings
+select * from Toppings
+
+create view ToppingPopularity
+as
+select t.[Name], count(t.[Name]) as NoTimesOrdered from Orders o
+inner join Pizzas p on o.Id = p.OrderId
+inner join PizzaToppings pt on pt.PizzaId = p.Id
+inner join Toppings t on pt.ToppingId = t.Id
+group by t.[Name]
+go
+
+select * from dbo.ToppingPopularity
+order by NoTimesOrdered desc
+go
+
+
+
+/* There should be a view with users and the amount of pizzas they ordered​ (FullName, OrderedPizzas)*/
+-- bob bobski, 15
+
+select * from Users
+select * from Orders
+select * from Pizzas
+
+create view CountOfPizzasOrderedByUser
+as
+select dbo.GetFullName(u.Firstname, u.Lastname) as UserFullName,
+	count(p.Id) as PizzasOrdered	
+from Users u
+inner join Orders o on o.UserId = u.Id
+inner join Pizzas p on p.OrderId = o.Id
+group by dbo.GetFullName(u.Firstname, u.Lastname)
+go
+
+select * from dbo.CountOfPizzasOrderedByUser
+order by PizzasOrdered desc
+go
