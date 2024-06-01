@@ -320,7 +320,9 @@ EXEC dbo.GetFullPriceOfOrder1 @OrderId = 2
 lists pizzas by the number of times ordered, 
 starting from the most popular one ( Most times ordered )​ */
 
-CREATE VIEW [Pizza Popularity] AS
+use PizzaDB
+
+CREATE OR ALTER VIEW [Pizza Popularity] AS
 	SELECT p.Name, COUNT(p.Name) AS [Number of times ordered] FROM Orders AS o
 	JOIN Pizzas AS p
 	ON o.Id = p.OrderId
@@ -336,7 +338,7 @@ ORDER BY [Number of times ordered] DESC
 by the number of times ordered, starting 
 from the most popular one ( Most times ordered )​ */
 
-CREATE VIEW [Topping Popularity] AS
+CREATE OR ALTER VIEW [Topping Popularity] AS
 	SELECT t.Name, COUNT(t.Name) AS [Number of times ordered] FROM Orders AS o
 	JOIN Pizzas AS p
 	ON o.Id = p.OrderId
@@ -353,7 +355,7 @@ ORDER BY [Number of times ordered] DESC
 /* 10th Req => There should be a view 
 with users and the amount of pizzas they ordered​ */
 
-CREATE VIEW [Pizzas Ordered By Users] AS
+CREATE OR ALTER VIEW [Pizzas Ordered By Users] AS
 	SELECT dbo.GetFullName(u.FirstName, u.LastName) AS [User] ,COUNT(u.Id) AS [Pizzas Ordered] FROM Users AS u
 	JOIN Orders AS o
 	ON u.Id = o.UserId
